@@ -4,6 +4,11 @@ const path = require('path');
 const SRC_PATH = path.resolve(__dirname, 'src');
 const DIST_PATH = path.resolve(__dirname, 'dist');
 
+// 插件
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const OptimizeCSSAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+
 module.exports = {
     entry: {
         'index': [
@@ -30,6 +35,31 @@ module.exports = {
                     priority: 10
                 }
             }
-        }
+        },
+        minimizer: [
+            new UglifyJsPlugin({
+                cache: true,
+                parallel: true,
+                sourceMap: true
+            }),
+            new OptimizeCSSAssetsPlugin({})
+        ]
+    },
+    plugins: [
+        new MiniCssExtractPlugin({
+            filename: '[name].css',
+            chunkFilename: '[id].css'
+        })
+    ],
+    module: {
+        rules: [
+            {
+                test: /\.css$/,
+                use: [
+                    MiniCssExtractPlugin.loader,
+                    'css-loader'
+                ]
+            }
+        ]
     }
 }
