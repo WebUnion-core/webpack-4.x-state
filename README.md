@@ -55,6 +55,45 @@ webpack4 启动打包多了一个开发模式和生产模式的识别操作，�
     }
     ```
 
+## state2 ##
+
+阶段二是第三方模块的抽取，webpack3 中抽取第三方公共模块需要使用 CommonsChunkPlugin 插件，webpack4 则只要配置 optimization 选项即可:
+
+```js
+...
+module.exports = {
+    entry: {
+        'index': [
+            path.resolve(SRC_PATH, 'entry.js')
+        ],
+        'vendor': [
+            'react',
+            'react-dom'
+        ]
+    },
+    output: {
+        path: DIST_PATH,
+        filename: '[name].js',
+        chunkFilename: '[name].js'
+    },
+    optimization: {
+        splitChunks: {
+            cacheGroups: {
+                vendor: {
+                    test: /node_modules/, // 指定是node_modules下的第三方包
+                    chunks: 'initial',
+                    name: 'vendor', // 打包后的文件名，任意命名
+                    // 设置优先级，防止和自定义的公共代码提取时被覆盖，不进行打包
+                    priority: 10
+                }
+            }
+        }
+    }
+}
+```
+
+需要特别注意的是 priority 这个选项，如果你要更新打包出来的 vendor 文件的内容，要先把这个选项移除掉，否则打包出来的 vendor 不会更新。
+
 ---
 
 ```
